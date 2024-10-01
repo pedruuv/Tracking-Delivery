@@ -2,6 +2,7 @@ package com.tracking_delivery_system.delivery_status_service.controller;
 
 import com.tracking_delivery_system.delivery_status_service.dto.NewDeliverDto;
 import com.tracking_delivery_system.delivery_status_service.model.Deliver;
+import com.tracking_delivery_system.delivery_status_service.model.StatusUpdate;
 import com.tracking_delivery_system.delivery_status_service.repository.DeliverRepository;
 import com.tracking_delivery_system.delivery_status_service.service.KafkaProducer;
 import jakarta.validation.Valid;
@@ -30,7 +31,8 @@ public class DeliverController {
         repository.save(deliver);
 
         kafkaProducer.sendUpdate("new-delivery", deliver);
-        kafkaProducer.sendUpdate("delivery-status", "CREATED");
+        StatusUpdate status = new StatusUpdate(deliver.getId(), deliver.getStatus().name());
+        kafkaProducer.sendUpdate("delivery-status", status);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(deliver);
     }
