@@ -16,6 +16,7 @@ public class DeliveryProgressSimulator {
     private final LocationUpdateRepository repository;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ConcurrentMap<UUID, ScheduledFuture<?>> tasksMap = new ConcurrentHashMap<>();
+    private Random random = new Random();
 
     public void simulateDeliverProgress(LocationUpdate locationUpdate) {
         final long[] distance = {locationUpdate.getDistance()};
@@ -47,14 +48,7 @@ public class DeliveryProgressSimulator {
     }
 
     private Long calculateDistanceReduction() {
-        Random random = new Random();
-        double trafficCondition = getTrafficCondition();
         long baseReduction = 10;
-        return Math.round(baseReduction * trafficCondition * random.nextDouble());
-    }
-
-    private double getTrafficCondition() {
-        Random random = new Random();
-        return 0.5 + (random.nextDouble() * 1.5);
+        return Math.round(baseReduction * random.nextDouble());
     }
 }
