@@ -36,14 +36,19 @@ public class KafkaConsumer {
     }
 
     @KafkaListener(topics = "delivery-status", groupId = "notification-group")
-    public void consumeDeliveryStatusUpdate(String statusUpdate) throws JsonMappingException, JsonProcessingException{
-        StatusUpdate status = mapper.readValue(statusUpdate, StatusUpdate.class);
-        String deliveryId = status.getId().toString();
+    public void consumeDeliveryStatusUpdate(String statusUpdate) {
+        try {
+            StatusUpdate status = mapper.readValue(statusUpdate, StatusUpdate.class);
 
-        deliveriesMap.computeIfAbsent(deliveryId, id -> new HashMap<>());
-        deliveriesMap.get(deliveryId).put("delivery-status", status);
+            String deliveryId = status.getId().toString();
+            deliveriesMap.computeIfAbsent(deliveryId, id -> new HashMap<>());
+            deliveriesMap.get(deliveryId).put("delivery-status", status);
 
-        checkAndPrintMessage(deliveryId);
+            checkAndPrintMessage(deliveryId);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private synchronized void checkAndPrintMessage(String deliveryId) {

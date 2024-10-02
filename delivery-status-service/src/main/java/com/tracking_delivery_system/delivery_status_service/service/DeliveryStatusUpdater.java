@@ -2,6 +2,7 @@ package com.tracking_delivery_system.delivery_status_service.service;
 
 import com.tracking_delivery_system.delivery_status_service.model.Deliver;
 import com.tracking_delivery_system.delivery_status_service.model.DeliveryStatus;
+import com.tracking_delivery_system.delivery_status_service.model.StatusUpdate;
 import com.tracking_delivery_system.delivery_status_service.repository.DeliverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,8 @@ public class DeliveryStatusUpdater {
 
     private void updateDeliveryStatus(Deliver deliver, DeliveryStatus newStatus, UUID id) {
         deliver.setStatus(newStatus);
-        kafkaProducer.sendUpdate("delivery-status", newStatus.name());
+        StatusUpdate status = new StatusUpdate(deliver.getId(), newStatus.name());
+        kafkaProducer.sendUpdate("delivery-status", status);
         repository.save(deliver);
     }
 
